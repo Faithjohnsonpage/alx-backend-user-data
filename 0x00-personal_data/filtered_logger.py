@@ -4,6 +4,7 @@ import logging
 import re
 from typing import List, Tuple
 
+
 class RedactingFormatter(logging.Formatter):
     """ Redacting Formatter class """
 
@@ -17,7 +18,8 @@ class RedactingFormatter(logging.Formatter):
 
     def format(self, record: logging.LogRecord) -> str:
         message = record.getMessage()
-        record.msg = filter_datum(self.fields, self.REDACTION, message, self.SEPARATOR)
+        record.msg = filter_datum(self.fields,
+                                  self.REDACTION, message, self.SEPARATOR)
         return super(RedactingFormatter, self).format(record)
 
 
