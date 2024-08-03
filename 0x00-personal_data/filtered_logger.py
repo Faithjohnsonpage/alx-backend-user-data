@@ -2,7 +2,9 @@
 """This module implements personal data security"""
 import logging
 import re
-from typing import List, Tuple
+import os
+from typing import List
+import mysql.connector
 
 
 # Define the PII_FIELDS constant
@@ -57,3 +59,14 @@ def get_logger() -> logging.Logger:
     logger.addHandler(stream_handler)
 
     return logger
+
+
+def get_db():
+    """This function returns a connector to the database"""
+    connection = mysql.connector.connect(
+        host=os.getenv('PERSONAL_DATA_DB_HOST', 'localhost'),
+        database=os.getenv('PERSONAL_DATA_DB_NAME', ''),
+        user=os.getenv('PERSONAL_DATA_DB_USERNAME', 'root'),
+        password=os.getenv('PERSONAL_DATA_DB_PASSWORD', '')
+    )
+    return connection
