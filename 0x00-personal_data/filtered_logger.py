@@ -5,6 +5,10 @@ import re
 from typing import List, Tuple
 
 
+# Define the PII_FIELDS constant
+PII_FIELDS = ("name", "email", "phone", "ssn", "password")
+
+
 class RedactingFormatter(logging.Formatter):
     """ Redacting Formatter class """
 
@@ -33,3 +37,23 @@ def filter_datum(fields: List[str], redaction: str,
         pattern = f"{field}=.*?{separator}"
         message = re.sub(pattern, f"{field}={redaction}{separator}", message)
     return message
+
+
+def get_logger() -> logging.Logger:
+    """Creates a logger that obfuscates PII fields"""
+    # Create a logger with the name "user_data"
+    logger = logging.getLogger("user_data")
+    logger.setLevel(logging.INFO)
+    logger.propagate = False
+
+    # Create a StreamHandler
+    stream_handler = logging.StreamHandler()
+
+    # Create and set the formatter to the handler
+    formatter = RedactingFormatter(PII_FIELDS)
+    stream_handler.setFormatter(formatter)
+
+    # Add the handler to the logger
+    logger.addHandler(stream_handler)
+
+    return logger
