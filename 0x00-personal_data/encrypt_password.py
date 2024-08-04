@@ -5,7 +5,7 @@ import bcrypt
 
 def hash_password(password: str) -> str:
     """Implement a hash password"""
-    bytes = password.encode('utf-8')
+    bytes = password.encode()
 
     # generating the salt
     salt = bcrypt.gensalt()
