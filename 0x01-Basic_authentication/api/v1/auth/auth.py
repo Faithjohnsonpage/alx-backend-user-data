@@ -19,7 +19,14 @@ class Auth:
         path = path.rstrip('/') + '/'  # Ensure the path ends with a slash
 
         for excluded_path in excluded_paths:
-            if path.startswith(excluded_path.rstrip('/') + '/'):
+            # Normalize the excluded path
+            normalized_excluded_path = excluded_path.rstrip('/') + '/'
+            if normalized_excluded_path.endswith('*'):
+                # Remove the wildcard
+                normalized_excluded_path = normalized_excluded_path[:-1]
+                if path.startswith(normalized_excluded_path):
+                    return False
+            elif path.startswith(normalized_excluded_path):
                 return False
 
         return True
