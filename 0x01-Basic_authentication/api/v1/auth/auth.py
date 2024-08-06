@@ -11,22 +11,26 @@ class Auth:
         """Check if the path requires authentication"""
         if path is None:
             return True
-        
+
         if excluded_paths is None or not excluded_paths:
             return True
-        
+
         # Normalize the path
         path = path.rstrip('/') + '/'  # Ensure the path ends with a slash
-        
+
         for excluded_path in excluded_paths:
             if path.startswith(excluded_path.rstrip('/') + '/'):
                 return False
-        
+
         return True
 
     def authorization_header(self, request=None) -> str:
         """Get the authorization header from the request"""
-        return None
+        if request is None:
+            return None
+
+        authorization_header = request.headers.get('Authorization')
+        return authorization_header if authorization_header else None
 
     def current_user(self, request=None) -> TypeVar('User'):
         """Get the current user from the request"""
