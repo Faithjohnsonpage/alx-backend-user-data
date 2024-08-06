@@ -20,6 +20,7 @@ if os.getenv('AUTH_TYPE') == 'auth':
 elif os.getenv('AUTH_TYPE') == 'basic_auth':
     auth = BasicAuth()
 
+
 @app.before_request
 def filter():
     """A before_request handler for filtering each request."""
