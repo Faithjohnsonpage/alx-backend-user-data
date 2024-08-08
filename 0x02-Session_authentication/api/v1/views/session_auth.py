@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
 """New view for Session Authentication"""
 from api.v1.views import session_views
-from flask import jsonify, request, make_response, Response
+from flask import jsonify, request, make_response
 from models.user import User
 import os
 
 
 @session_views.route('/auth_session/login', methods=['POST'],
                      strict_slashes=False)
-def session_login() -> Response:
+def session_login() -> dict:
     """Handles user login and session creation."""
     email = request.form.get('email')
     if email is None:
