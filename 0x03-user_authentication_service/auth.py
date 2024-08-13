@@ -35,20 +35,20 @@ class Auth:
         except NoResultFound:
             return False
 
-    @staticmethod
-    def _generate_uuid() -> str:
-        """generates a string representation uuid"""
-        return str(uuid.uuid4())
-
     def create_session(self, email: str) -> str:
         """Creates a session and stores it for a particular user in the db"""
         try:
             user = self._db.find_user_by(email=email)
-            session_id = self._generate_uuid()
+            session_id = _generate_uuid()
             user.session_id = session_id
             return session_id
         except NoResultFound:
             return None
+
+
+def _generate_uuid() -> str:
+        """Generates a string representation of a UUID"""
+        return str(uuid.uuid4())
 
 
 def _hash_password(password: str) -> bytes:
