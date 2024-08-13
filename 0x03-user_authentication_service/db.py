@@ -60,6 +60,6 @@ class DB:
             if not hasattr(user, key):
                 raise ValueError
             setattr(user, key, value)
-    
+
         # Commit changes to the database
         self._session.commit()
