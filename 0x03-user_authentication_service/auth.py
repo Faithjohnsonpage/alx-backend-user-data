@@ -47,8 +47,8 @@ class Auth:
 
 
 def _generate_uuid() -> str:
-        """Generates a string representation of a UUID"""
-        return str(uuid.uuid4())
+    """Generates a string representation of a UUID"""
+    return str(uuid.uuid4())
 
 
 def _hash_password(password: str) -> bytes:
