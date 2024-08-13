@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """This module handles the Flask application"""
-from flask import Flask, jsonify, request, abort, make_response
+from flask import Flask, jsonify, request, abort, make_response, redirect
+from flask import url_for
 from auth import Auth
 from sqlalchemy.orm.exc import NoResultFound
 
@@ -39,6 +40,20 @@ def login():
     response = make_response(jsonify({"email": email, "message": "logged in"}))
     response.set_cookie('session_id', session_id)
     return response
+
+
+@app.route("/sessions", methods=["DELETE"], strict_slashes=False)
+def logout():
+    """Log out"""
+    session_id = request.cookies.get('session_id')
+    if session_id is None:
+        abort(403)  # Forbidden if no session_id is provided
+
+    user = AUTH.get_user_from_session_id(session_id)
+    if user is None:
+        abort(403)
+    AUTH.destroy_session(user.id)
+    redirect(url_for("message"))
 
 
 if __name__ == "__main__":
