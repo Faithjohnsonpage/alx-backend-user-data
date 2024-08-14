@@ -43,13 +43,12 @@ class DB:
         """This method takes in arbitrary keyword arguments and returns the
         first row found in the users table as filtered by the method’s
         input arguments."""
-        if not kwargs:
-            raise InvalidRequestError
-
-        user = self._session.query(User).filter_by(**kwargs).first()
-        if user is None:
+        try:
+            return self._session.query(User).filter_by(**kwargs).first()
+        except NoResultFound:
             raise NoResultFound
-        return user
+        except InvalidRequestError:
+            raise InvalidRequestError
 
     def update_user(self, user_id: int, **kwargs: Dict[str, Any]) -> None:
         """This method updates a user"""
