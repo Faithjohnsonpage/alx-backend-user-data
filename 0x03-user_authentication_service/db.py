@@ -39,18 +39,19 @@ class DB:
         self._session.commit()
         return user
 
-    def find_user_by(self, **kwargs: Dict[str, Any]) -> User:
+    def find_user_by(self, **kwargs) -> User:
         """This method takes in arbitrary keyword arguments and returns the
         first row found in the users table as filtered by the method’s
         input arguments."""
-        try:
-            return self._session.query(User).filter_by(**kwargs).first()
-        except NoResultFound:
-            raise NoResultFound
-        except InvalidRequestError:
+        if not kwargs:
             raise InvalidRequestError
 
-    def update_user(self, user_id: int, **kwargs: Dict[str, Any]) -> None:
+        user = self._session.query(User).filter_by(**kwargs).first()
+        if not user:
+            raise NoResultFound
+        return user
+
+    def update_user(self, user_id: int, **kwargs) -> None:
         """This method updates a user"""
         user = self.find_user_by(id=user_id)
 
