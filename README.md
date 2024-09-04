@@ -91,74 +91,6 @@ Let's start by identifying the core entities (tables or collections) that will b
 - **Comments**: Store user comments on music tracks.
 - **Followers**: Track user followers for social features.
 
-### **6. Sample Schema in MySQL**
-
-Here’s a sample SQL schema for MySQL:
-
-```sql
-CREATE TABLE Users (
-    userId VARCHAR(36) PRIMARY KEY,
-    username VARCHAR(255) NOT NULL,
-    email VARCHAR(255) UNIQUE NOT NULL,
-    passwordHash VARCHAR(255) NOT NULL,
-    role ENUM('artist', 'listener') NOT NULL,
-    profilePictureUrl TEXT,
-    createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-);
-
-CREATE TABLE Genres (
-    genreId VARCHAR(36) PRIMARY KEY,
-    name VARCHAR(255) NOT NULL
-);
-
-CREATE TABLE Music (
-    musicId VARCHAR(36) PRIMARY KEY,
-    title VARCHAR(255) NOT NULL,
-    artistId VARCHAR(36),
-    albumId VARCHAR(36),
-    genreId VARCHAR(36),
-    fileUrl TEXT NOT NULL,
-    duration INT NOT NULL,
-    releaseDate DATE,
-    createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (artistId) REFERENCES Users(userId),
-    FOREIGN KEY (albumId) REFERENCES Albums(albumId),
-    FOREIGN KEY (genreId) REFERENCES Genres(genreId)
-);
-
-CREATE TABLE Playlists (
-    playlistId VARCHAR(36) PRIMARY KEY,
-    name VARCHAR(255) NOT NULL,
-    description TEXT,
-    userId VARCHAR(36) NOT NULL,
-    createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (userId) REFERENCES Users(userId)
-);
-
-CREATE TABLE PlaylistMusic (
-    playlistId VARCHAR(36),
-    musicId VARCHAR(36),
-    `order` INT,
-    PRIMARY KEY (playlistId, musicId),
-    FOREIGN KEY (playlistId) REFERENCES Playlists(playlistId),
-    FOREIGN KEY (musicId) REFERENCES Music(musicId)
-);
-
-CREATE TABLE Albums (
-    albumId VARCHAR(36) PRIMARY KEY,
-    title VARCHAR(255) NOT NULL,
-    artistId VARCHAR(36),
-    releaseDate DATE,
-    coverImageUrl TEXT,
-    createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (artistId) REFERENCES Users(userId)
-);
-```
-
 ### **7. Review and Adjust**
 - **Review Relationships**: Ensure relationships are clear and correctly represent the real-world interactions between entities.
 - **Optimize for Queries**: Think about the most common queries your application will run and ensure the schema supports them efficiently.
@@ -182,89 +114,6 @@ In addition to the previously identified entities, you'll need to add a new enti
 - `createdAt` (Timestamp): Date and time when the news was created.
 - `updatedAt` (Timestamp): Date and time when the news was last updated.
 
-### **3. Relationships Between Entities**
-- The **News** entity is largely standalone but may have associations based on category or author if you plan to link it with other entities like **User** (if you have a journalist user role).
-
-### **4. Sample Schema in MySQL**
-Here’s an updated SQL schema for MySQL with the News entity included:
-
-```sql
-CREATE TABLE Users (
-    userId VARCHAR(36) PRIMARY KEY,
-    username VARCHAR(255) NOT NULL,
-    email VARCHAR(255) UNIQUE NOT NULL,
-    passwordHash VARCHAR(255) NOT NULL,
-    role ENUM('artist', 'listener') NOT NULL,
-    profilePictureUrl TEXT,
-    createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-);
-
-CREATE TABLE Genres (
-    genreId VARCHAR(36) PRIMARY KEY,
-    name VARCHAR(255) NOT NULL
-);
-
-CREATE TABLE Music (
-    musicId VARCHAR(36) PRIMARY KEY,
-    title VARCHAR(255) NOT NULL,
-    artistId VARCHAR(36),
-    albumId VARCHAR(36),
-    genreId VARCHAR(36),
-    fileUrl TEXT NOT NULL,
-    duration INT NOT NULL,
-    releaseDate DATE,
-    createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (artistId) REFERENCES Users(userId),
-    FOREIGN KEY (albumId) REFERENCES Albums(albumId),
-    FOREIGN KEY (genreId) REFERENCES Genres(genreId)
-);
-
-CREATE TABLE Playlists (
-    playlistId VARCHAR(36) PRIMARY KEY,
-    name VARCHAR(255) NOT NULL,
-    description TEXT,
-    userId VARCHAR(36) NOT NULL,
-    createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (userId) REFERENCES Users(userId)
-);
-
-CREATE TABLE PlaylistMusic (
-    playlistId VARCHAR(36),
-    musicId VARCHAR(36),
-    `order` INT,
-    PRIMARY KEY (playlistId, musicId),
-    FOREIGN KEY (playlistId) REFERENCES Playlists(playlistId),
-    FOREIGN KEY (musicId) REFERENCES Music(musicId)
-);
-
-CREATE TABLE Albums (
-    albumId VARCHAR(36) PRIMARY KEY,
-    title VARCHAR(255) NOT NULL,
-    artistId VARCHAR(36),
-    releaseDate DATE,
-    coverImageUrl TEXT,
-    createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (artistId) REFERENCES Users(userId)
-);
-
-CREATE TABLE News (
-    newsId VARCHAR(36) PRIMARY KEY,
-    title VARCHAR(255) NOT NULL,
-    content TEXT NOT NULL,
-    author VARCHAR(255),
-    publishedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    category VARCHAR(255) NOT NULL,
-    createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-);
-```
-
-### **5. Updated Endpoints to Include News**
-
 #### **8. News**
 - **`POST /news`**: Add a new news article.
   - **Headers**: `Authorization: Bearer <admin_token>`
@@ -287,8 +136,117 @@ CREATE TABLE News (
   - **Headers**: `Authorization: Bearer <admin_token>`
   - **Response**: `{ "message": "News article deleted successfully" }`
 
-### **6. Adjustments and Implementation**
-- **Database Setup**: Ensure the new `News` table is created alongside the other tables when you set up your database.
-- **Endpoint Implementation**: These news-related endpoints should be implemented after you finish the core music hosting features.
+Based on the provided SQLAlchemy models, here are the corresponding SQL table definitions for each of them:
 
-Would you like to proceed with implementing these changes, or do you have any adjustments in mind?
+### **1. `Users` Table**
+```sql
+CREATE TABLE Users (
+    id VARCHAR(60) PRIMARY KEY,
+    username VARCHAR(255) NOT NULL,
+    email VARCHAR(255) UNIQUE NOT NULL,
+    password_hash VARCHAR(255) NOT NULL,
+    profile_picture_url TEXT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+```
+
+### **2. `Albums` Table**
+```sql
+CREATE TABLE Albums (
+    id VARCHAR(60) PRIMARY KEY,
+    title VARCHAR(255) NOT NULL,
+    artist_id VARCHAR(60),
+    release_date DATE,
+    cover_image_url TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (artist_id) REFERENCES Users(id)
+);
+```
+
+### **3. `Artists` Table**
+```sql
+CREATE TABLE Artists (
+    id VARCHAR(60) PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    bio TEXT NULL,
+    profile_picture_url TEXT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+```
+
+### **4. `Music` Table**
+```sql
+CREATE TABLE Music (
+    id VARCHAR(60) PRIMARY KEY,
+    title VARCHAR(255) NOT NULL,
+    artist_id VARCHAR(60),
+    album_id VARCHAR(60),
+    genre_id VARCHAR(60),
+    file_url TEXT NOT NULL,
+    duration INT NOT NULL,
+    release_date DATE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (artist_id) REFERENCES Users(id),
+    FOREIGN KEY (album_id) REFERENCES Albums(id),
+    FOREIGN KEY (genre_id) REFERENCES Genres(id)
+);
+```
+
+### **5. `News` Table**
+```sql
+CREATE TABLE News (
+    id VARCHAR(60) PRIMARY KEY,
+    title VARCHAR(255) NOT NULL,
+    content TEXT NOT NULL,
+    author VARCHAR(255) NULL,
+    published_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    category VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+```
+
+### **6. `Playlists` Table**
+```sql
+CREATE TABLE Playlists (
+    id VARCHAR(60) PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    description TEXT NULL,
+    user_id VARCHAR(60) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES Users(id)
+);
+```
+
+### **7. `PlaylistMusic` Association Table**
+```sql
+CREATE TABLE PlaylistMusic (
+    playlist_id VARCHAR(60),
+    music_id VARCHAR(60),
+    `order` INT,
+    PRIMARY KEY (playlist_id, music_id),
+    FOREIGN KEY (playlist_id) REFERENCES Playlists(id),
+    FOREIGN KEY (music_id) REFERENCES Music(id)
+);
+```
+
+### **8. `Genres` Table**
+```sql
+CREATE TABLE Genres (
+    id VARCHAR(60) PRIMARY KEY,
+    name VARCHAR(255) NOT NULL
+);
+```
+
+### **Explanation:**
+
+- **Primary Keys and Foreign Keys**: Each table has a primary key column, typically named `id`, except for the `Genres` table where the primary key is explicitly defined as `id`. Foreign keys link the tables based on the relationships defined in SQLAlchemy.
+- **`created_at` and `updated_at`**: These timestamp columns are used to track when each record was created and last updated, and they are automatically handled by SQL.
+- **Relationships**: The `Albums`, `Music`, `Playlists`, and `PlaylistMusic` tables include foreign keys that link to other tables, which is also represented in the SQLAlchemy models through relationships and back references. 
+
+This SQL will ensure that the database schema matches your SQLAlchemy models.
